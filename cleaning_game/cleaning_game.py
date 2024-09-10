@@ -1,8 +1,4 @@
-import pygame
-from enum import Enum, unique
-from pygame.locals import *
-import numpy as np
-import time
+from game_run import *
 
 @unique
 class direction(Enum):
@@ -17,26 +13,57 @@ class tile(Enum):
     Dirty = 1
     Clean = 2
 
+@unique
+class action_type(Enum):
+    Nan = -1
+    Invalid = 0
+    Move = 1
+    Turn = 2
+
 #The Map we are going to clean
 class Map():
     map_tile : np.array
+    all_num : int
+    clean_num : int
+    unavailable_num : int
 
     def __init__(self, array : np.array = np.ones((10,10))):
         self.map_tile = array
         self.map_tile.astype(np.int32)
+        self.all_num = self.map_tile.size
+        print(self.all_num)
+        self.clean_num = 0
+
+        it = np.nditer(self.map_tile, flags = ['multi_index'])
+        self.unavailable_num = 0
+        while not it.finished:
+            idx = it.multi_index
+            if self.map_tile[idx] == tile.Unavailable.value:
+                self.unavailable_num += 1
+            it.iternext()
+        print(self.unavailable_num)
+
+
+    def check_all_clean(self) -> bool :
+        if self.all_num == self.unavailable_num + self.clean_num:
+            return True
+        return False
 
     def set_map_tile_type(self, loc:tuple, tile_type:tile):
         try:
             self.map_tile[loc[0]][loc[1]] = tile_type.value
         except:
             print("Set location " + str(loc) + " with tile type " + str(tile_type) + " failed")
+            pygame.quit()
 
     def get_map_tile(self):
         print(self.map_tile)
 
     def clean_tiles(self, clean_pos: list):
         for loc in clean_pos:
-            self.set_map_tile_type(loc, tile.Clean)
+            if self.map_tile[loc[0]][loc[1]] == tile.Dirty.value:
+                self.clean_num += 1
+                self.set_map_tile_type(loc, tile.Clean)
 
     def draw_map(self, surface : pygame.Surface):
         it = np.nditer(self.map_tile, flags = ['multi_index'])
@@ -70,18 +97,19 @@ class Roomba():
         self.size = size
         self.pos = pos
 
-    def valid_movement(self, map : Map, movement : pygame.Vector2) -> bool:
+    def valid_movement(self, map : Map, movement : pygame.Vector2) -> action_type:
         if movement.x != 0 and movement.y !=0:
             print("Can't move Diagnoally")
-            return False
+            return action_type.Invalid
+
         temp_pos = self.pos + movement
         clean_arr = []
         if temp_pos.x < 0 or temp_pos.x + self.size.x > map.map_tile.shape[0]:
             print("Roomba out of Map")
-            return False
+            return action_type.Invalid
         if  temp_pos.y < 0 or temp_pos.y + self.size.y > map.map_tile.shape[1]:
             print("Roomba out of Map")
-            return False
+            return action_type.Invalid
 
         i = 0
         for i in range(int(self.size.x)):
@@ -92,15 +120,15 @@ class Roomba():
                 if map.map_tile[search_tile_x][search_tile_y] == tile.Unavailable.value:
                     print("Roomba enter invalid part of Map")
                     clean_arr.clear()
-                    return False
+                    return action_type.Invalid
                 clean_arr.append((search_tile_x, search_tile_y))
 
         self.pos = temp_pos
         map.clean_tiles(clean_arr)
-        return True
+        return action_type.Move
         
 
-    def move(self, map : Map, amount : int) -> bool:
+    def move(self, map : Map, amount : int) -> action_type:
         match self.arrow:
             case direction.UP:
                 return self.valid_movement(map, pygame.Vector2(0,-1))
@@ -113,7 +141,7 @@ class Roomba():
             case _:
                 print("Arrow Exception with arrow = " + self.arrow)
                 pygame.quit()
-                return False
+                return action_type.Invalid
 
     def turn(self, clockwise:bool):
         val_temp = self.arrow.value
@@ -123,18 +151,18 @@ class Roomba():
             val_temp = (val_temp + 3) % 4
         self.arrow = direction(val_temp)
 
-    def action(self, map : Map, key_press : direction) -> bool:
+    def action(self, map : Map, key_press : direction) -> action_type:
         if self.arrow == key_press:
             return self.move(map,1)
         elif (self.arrow.value + 1)%4 == key_press.value:
             self.turn(True)
-            return True
+            return action_type.Turn
         elif (self.arrow.value + 3)%4 == key_press.value:
             self.turn(False)
-            return True
+            return action_type.Turn
         else:
             print("invalid movement")
-            return False
+            return action_type.Invalid
 
     def get_info(self):
         print("Roomba at " + str(self.pos))
