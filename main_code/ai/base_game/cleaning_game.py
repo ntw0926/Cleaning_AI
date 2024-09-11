@@ -1,6 +1,11 @@
-from game_run import *
+import pygame
+from enum import Enum, unique, global_enum
+from pygame.locals import *
+import numpy as np
+import time
 
 @unique
+@global_enum
 class direction(Enum):
     UP = 0
     RIGHT = 1
@@ -93,7 +98,7 @@ class Roomba():
     pos : pygame.Vector2
     arrow = direction.UP
     
-    def __init__(self, size:pygame.Vector2 = pygame.Vector2(2,2), pos:pygame.Vector2 = pygame.Vector2(0,0)):
+    def __init__(self, size:pygame.Vector2 = pygame.Vector2(2,2), pos:pygame.Vector2 = pygame.Vector2(1,1)):
         self.size = size
         self.pos = pos
 
