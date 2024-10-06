@@ -1,3 +1,6 @@
+import sys
+sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
+
 import pygame
 from enum import Enum, unique, global_enum
 from pygame.locals import *
@@ -36,7 +39,6 @@ class Map():
         self.map_tile = array
         self.map_tile.astype(np.int32)
         self.all_num = self.map_tile.size
-        print(self.all_num)
         self.clean_num = 0
 
         it = np.nditer(self.map_tile, flags = ['multi_index'])
@@ -46,8 +48,15 @@ class Map():
             if self.map_tile[idx] == tile.Unavailable.value:
                 self.unavailable_num += 1
             it.iternext()
-        print(self.unavailable_num)
 
+    def reset_map(self):
+        self.clean_num = 0
+        it = np.nditer(self.map_tile, flags = ['multi_index'])
+        while not it.finished:
+            idx = it.multi_index
+            if self.map_tile[idx] == tile.Clean.value:
+                self.set_map_tile_type(idx, tile.Dirty)
+            it.iternext()
 
     def check_all_clean(self) -> bool :
         if self.all_num == self.unavailable_num + self.clean_num:
@@ -96,11 +105,18 @@ class Roomba():
     size : pygame.Vector2
     #Position of Left bottom 
     pos : pygame.Vector2
+    _reset_pos : pygame.Vector2
     arrow = direction.UP
     
     def __init__(self, size:pygame.Vector2 = pygame.Vector2(2,2), pos:pygame.Vector2 = pygame.Vector2(1,1)):
         self.size = size
         self.pos = pos
+        self._reset_pos = pos
+
+    def reset_pos(self):
+        self.pos.x = self._reset_pos.x
+        self.pos.y = self._reset_pos.y
+        self.arrow = direction.UP
 
     def valid_movement(self, map : Map, movement : pygame.Vector2) -> action_type:
         if movement.x != 0 and movement.y !=0:

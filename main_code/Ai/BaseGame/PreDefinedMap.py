@@ -1,4 +1,7 @@
-from cleaning_game import np
+import sys
+sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
+
+from Ai.BaseGame.CleaningGame import np
 basic_map = np.array([[0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,1,1,1,1,1,1,1,1,1,1,0],
                     [0,1,1,1,1,1,1,1,1,1,1,0],
