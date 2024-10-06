@@ -8,9 +8,6 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common import env_checker
 
-CHECKPOINT_DIR = './train/'
-LOG_DIR = './logs/'
-
 from Ai.RoombaEnv import *
 import Ai.BaseGame.PreDefinedMap as pre_defined_maps
 
@@ -36,14 +33,20 @@ class TrainAndLoggingCallback(BaseCallback):
         return True
 
 
+CHECKPOINT_DIR = './train/1Tile'
+LOG_DIR = './logs/1Tile'
+
 def main():
     dealt_map = Map(pre_defined_maps.basic_map)
     roomba = Roomba()
     env = RoombaEnv_1Tile(dealt_map,roomba)
     env_checker.check_env(env)
-    callback = TrainAndLoggingCallback(check_freq=10000, save_path=CHECKPOINT_DIR)
+
+    callback = TrainAndLoggingCallback(check_freq=1000000, save_path=CHECKPOINT_DIR)
     model = DQN('MlpPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
-    model.learn(total_timesteps=500000, callback=callback)
+    model.learn(total_timesteps=100000000, callback=callback)
+
+    
 
 if __name__ == "__main__":
     main()

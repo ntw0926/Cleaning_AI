@@ -12,6 +12,9 @@ from gymnasium.spaces import Space, Discrete
     #1-3. 이동시 타일을 얼마나 치웠는지에 따른 weight 부여
     #1-4. 청소한 타일수 / 총 활동 횟수
 #2. 주변 환경 (roomba가 차지하는 공간만, 혹은 roomba가 차지하는 공간에서 한칸씩 떨어져서 다음 이동할수 있는 공간 혹은 맵 전체)
+    #2-1 Roomba의 위치에 1칸씩을 추가한 사각형
+    #2-2 map에서 남은 dirty tile의 위치들
+    #2-3 map 전체
 
 class RoombaBaseEnv(Env):
     invalid_used : int
@@ -123,7 +126,8 @@ class RoombaBaseEnv(Env):
         return 0.0
 
     def render(self):
-        self.screen.fill("white")    
+        pygame.event.clear()
+        self.screen.fill("white")
         self.map.draw_map(self.screen)
         self.roomba.draw_Roomba(self.screen)
         invalid_txt = self.font.render("Invalid used : " + str(self.invalid_used), False, ((200,0,0) if self.update == action_type.Invalid else (0,0,0)))
@@ -136,5 +140,4 @@ class RoombaBaseEnv(Env):
         self.screen.blit(cleaning_txt, [650, 400])
         pygame.display.update()
         self.update = action_type.Nan
-
         self.clock.tick(0)
