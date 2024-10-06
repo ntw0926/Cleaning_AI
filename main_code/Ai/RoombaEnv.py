@@ -25,8 +25,10 @@ class RoombaBaseEnv(Env):
     roomba : Roomba = None
     is_first_display = True
 
+    #For step and reward
     update : action_type = action_type.Nan
     prev_clean_num = 0
+    step_taken = 0
 
     #For displaying
     font = None
@@ -88,9 +90,11 @@ class RoombaBaseEnv(Env):
         self.roomba.valid_movement(self.map, pygame.Vector2(0,0))
         self.prev_clean_num = self.map.clean_num
         self.update = action_type.Nan
+        self.step_taken = 0
         return self.get_observation(), self._get_info()
 
     def step(self, action):
+        self.step_taken += 1
         action_map = {
         0:direction.UP,
         1:direction.RIGHT,
@@ -114,7 +118,7 @@ class RoombaBaseEnv(Env):
 
         self.render()
 
-        return self.get_observation(), self.reward_function(), self.map.check_all_clean(), False, self._get_info()
+        return self.get_observation(), self.reward_function(), self.map.check_all_clean(), (self.step_taken >= 1000), self._get_info()
 
     def set_map(self, map:Map):
         self.map = map
@@ -141,3 +145,8 @@ class RoombaBaseEnv(Env):
         pygame.display.update()
         self.update = action_type.Nan
         self.clock.tick(0)
+    
+    def close(self):
+        if self.screen != None:
+            pygame.display.quit()
+            pygame.quit()

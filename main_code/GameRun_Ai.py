@@ -44,7 +44,7 @@ def main():
 
     callback = TrainAndLoggingCallback(check_freq=1000000, save_path=CHECKPOINT_DIR)
     model = DQN('MlpPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
-    model.learn(total_timesteps=100000000, callback=callback)
+    model.learn(total_timesteps=100000000, callback=callback, progress_bar= True)
 
     
 
