@@ -37,7 +37,7 @@ class Map():
 
     def __init__(self, array : np.array = np.ones((10,10))):
         self.map_tile = array
-        self.map_tile.astype(np.int32)
+        self.map_tile.astype(np.int64)
         self.all_num = self.map_tile.size
         self.clean_num = 0
 
@@ -120,16 +120,13 @@ class Roomba():
 
     def valid_movement(self, map : Map, movement : pygame.Vector2) -> action_type:
         if movement.x != 0 and movement.y !=0:
-            print("Can't move Diagnoally")
             return action_type.Invalid
 
         temp_pos = self.pos + movement
         clean_arr = []
         if temp_pos.x < 0 or temp_pos.x + self.size.x > map.map_tile.shape[0]:
-            print("Roomba out of Map")
             return action_type.Invalid
         if  temp_pos.y < 0 or temp_pos.y + self.size.y > map.map_tile.shape[1]:
-            print("Roomba out of Map")
             return action_type.Invalid
 
         i = 0
@@ -139,7 +136,6 @@ class Roomba():
                 search_tile_x = int(temp_pos.x) + i
                 search_tile_y = int(temp_pos.y) + j
                 if map.map_tile[search_tile_x][search_tile_y] == tile.Unavailable.value:
-                    print("Roomba enter invalid part of Map")
                     clean_arr.clear()
                     return action_type.Invalid
                 clean_arr.append((search_tile_x, search_tile_y))
@@ -182,7 +178,6 @@ class Roomba():
             self.turn(False)
             return action_type.Turn
         else:
-            print("invalid movement")
             return action_type.Invalid
 
     def get_info(self):

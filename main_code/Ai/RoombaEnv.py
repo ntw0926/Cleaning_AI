@@ -2,9 +2,8 @@ import sys
 sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
 
 from Ai.BaseGame.CleaningGame import *
-import pyautogui
-from gymnasium import Env
-from gymnasium.spaces import Box, Discrete
+from gymnasium import *
+from gymnasium.spaces import Space, Discrete
 
 #줄수있는 변수
 #1. 총 활동 횟수 (무브, 턴, 인벨리드의 모든 액션의 합)
@@ -21,50 +20,87 @@ class RoombaBaseEnv(Env):
     action_space : list
     map : Map = Map()
     roomba : Roomba = None
+    is_first_display = True
 
     update : action_type = action_type.Nan
-    step_lock : bool = False
-    reset_lock : bool = False
     prev_clean_num = 0
 
+    #For displaying
+    font = None
+    screen = None
+    clock = None
 
     def __init__(self,map : Map, roomba : Roomba):
         super().__init__()
-        self.action_space = [direction.UP, direction.RIGHT, direction.DOWN, direction.LEFT]
-        self.invalid_used = 0
-        self.move_used = 0
-        self.turn_used = 0
+        self.action_space = Discrete(4)
         if map:
             self.set_map(map)
         if roomba:
             self.roomba = roomba
-            self.prev_clean_num = self.roomba.size.x * self.roomba.size.y
+            self.roomba.valid_movement(self.map, pygame.Vector2(0,0))
+            self.prev_clean_num = self.map.clean_num
+        self.invalid_used = 0
+        self.move_used = 0
+        self.turn_used = 0
+        if self.screen == None:
+            pygame.init()
+            self.screen = pygame.display.set_mode((1080,720))
+            self.screen.fill("white")
+            self.clock = pygame.time.Clock()
+        
+            self.font = pygame.font.SysFont("malgungothic", 40)
+            pygame.display.set_caption("Roomba Game")
+            pygame.display.update()
 
-    def reset(self, seed=None):
-        while self.reset_lock:
-            pass
-        self.reset_lock = True
+    def _get_info(self):
+        return{
+            "invalid use" : self.invalid_used,
+            "move use" : self.move_used,
+            "turn use" : self.turn_used,
+            "roomba pos" : self.roomba.pos,
+            "roomba dir" : self.roomba.arrow
+        }
+
+    def reset(self, seed = None, options = None):
+        if self.screen != None and not self.is_first_display:
+            #visualization before reset
+            invalid_txt = self.font.render("Invalid used : " + str(self.invalid_used), False, ((200,0,0) if self.update == action_type.Invalid else (0,0,0)))
+            turn_txt = self.font.render("Turn used : " + str(self.turn_used), False, ((200,0,0) if self.update == action_type.Turn else (0,0,0)))
+            move_txt = self.font.render("Move used : " + str(self.move_used), False, ((200,0,0) if self.update == action_type.Move else (0,0,0)))         
+            cleaning_txt = self.font.render("Tiles " + str(self.map.clean_num) + " / " + str(self.map.all_num- self.map.unavailable_num), False, (0,0,0))
+            self.screen.blit(invalid_txt, [650, 100])
+            self.screen.blit(turn_txt, [650,200])
+            self.screen.blit(move_txt, [650,300])
+            self.screen.blit(cleaning_txt, [650, 400])
+            self.screen.blit(self.font.render("Stage Cleared", False, (255,0,255)), [650,500])
+            print("Stage Cleared")
+            pygame.display.update()
+
+        super().reset(seed=seed)
         self.invalid_used = 0
         self.move_used = 0
         self.turn_used = 0
         self.map.reset_map()
         self.roomba.reset_pos()
-        self.prev_clean_num = self.roomba.size.x * self.roomba.size.y
+        self.roomba.valid_movement(self.map, pygame.Vector2(0,0))
+        self.prev_clean_num = self.map.clean_num
         self.update = action_type.Nan
-        self.reset_lock = False
-        return self.get_observation(), None
+        return self.get_observation(), self._get_info()
 
-    def step(self, action:direction):
-        while self.step_lock:
-            pass
-        self.step_lock = True
-        if acion == direction.UP:
+    def step(self, action):
+        action_map = {
+        0:direction.UP,
+        1:direction.RIGHT,
+        2:direction.DOWN,
+        3:direction.LEFT
+        }
+        if action == 0:
             update = self.roomba.action(self.map, direction.UP)
-        elif action == direction.RIGHT:
+        elif action == 1:
             update = self.roomba.action(self.map, direction.RIGHT)
-        elif action == direction.DOWN:
+        elif action == 2:
             update = self.roomba.action(self.map, direction.DOWN)
-        elif action == direction.LEFT:
+        elif action == 3:
             update = self.roomba.action(self.map, direction.LEFT)
         else:
             update = action_type.Nan
@@ -73,7 +109,9 @@ class RoombaBaseEnv(Env):
         self.turn_used = (self.turn_used + 1) if update == action_type.Turn else (self.turn_used)
         self.move_used = (self.move_used + 1) if update == action_type.Move else (self.move_used)
 
-        return self.get_observation(), self.reward_function(), self.map.check_all_clean(), False, None
+        self.render()
+
+        return self.get_observation(), self.reward_function(), self.map.check_all_clean(), False, self._get_info()
 
     def set_map(self, map:Map):
         self.map = map
@@ -82,5 +120,21 @@ class RoombaBaseEnv(Env):
         return None
 
     def reward_function(self, update : action_type) -> float:
-        self.step_lock = False
         return 0.0
+
+    def render(self):
+        self.screen.fill("white")    
+        self.map.draw_map(self.screen)
+        self.roomba.draw_Roomba(self.screen)
+        invalid_txt = self.font.render("Invalid used : " + str(self.invalid_used), False, ((200,0,0) if self.update == action_type.Invalid else (0,0,0)))
+        turn_txt = self.font.render("Turn used : " + str(self.turn_used), False, ((200,0,0) if self.update == action_type.Turn else (0,0,0)))
+        move_txt = self.font.render("Move used : " + str(self.move_used), False, ((200,0,0) if self.update == action_type.Move else (0,0,0)))         
+        cleaning_txt = self.font.render("Tiles " + str(self.map.clean_num) + " / " + str(self.map.all_num- self.map.unavailable_num), False, (0,0,0))
+        self.screen.blit(invalid_txt, [650, 100])
+        self.screen.blit(turn_txt, [650,200])
+        self.screen.blit(move_txt, [650,300])
+        self.screen.blit(cleaning_txt, [650, 400])
+        pygame.display.update()
+        self.update = action_type.Nan
+
+        self.clock.tick(0)
