@@ -15,6 +15,7 @@ from gymnasium.spaces import Space, Discrete
     #2-1 Roomba의 위치에 1칸씩을 추가한 사각형
     #2-2 map에서 남은 dirty tile의 위치들
     #2-3 map 전체
+#3. roomba의 위치와 direction
 
 class RoombaBaseEnv(Env):
     invalid_used : int
@@ -126,7 +127,8 @@ class RoombaBaseEnv(Env):
     def get_observation(self):
         return None
 
-    def reward_function(self, update : action_type) -> float:
+    def reward_function(self) -> float:
+        assert("Reward function is Empty")
         return 0.0
 
     def render(self):
