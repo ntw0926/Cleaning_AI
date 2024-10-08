@@ -103,19 +103,20 @@ class RoombaBaseEnv(Env):
         3:direction.LEFT
         }
         if action == 0:
-            update = self.roomba.action(self.map, direction.UP)
+            self.update = self.roomba.action(self.map, direction.UP)
         elif action == 1:
-            update = self.roomba.action(self.map, direction.RIGHT)
+            self.update = self.roomba.action(self.map, direction.RIGHT)
         elif action == 2:
-            update = self.roomba.action(self.map, direction.DOWN)
+            self.update = self.roomba.action(self.map, direction.DOWN)
         elif action == 3:
-            update = self.roomba.action(self.map, direction.LEFT)
+            self.update = self.roomba.action(self.map, direction.LEFT)
         else:
+            assert("unexpected behavior in step")
             update = action_type.Nan
 
-        self.invalid_used = (self.invalid_used + 1) if update == action_type.Invalid else (self.invalid_used)
-        self.turn_used = (self.turn_used + 1) if update == action_type.Turn else (self.turn_used)
-        self.move_used = (self.move_used + 1) if update == action_type.Move else (self.move_used)
+        self.invalid_used = (self.invalid_used + 1) if self.update == action_type.Invalid else (self.invalid_used)
+        self.turn_used = (self.turn_used + 1) if self.update == action_type.Turn else (self.turn_used)
+        self.move_used = (self.move_used + 1) if self.update == action_type.Move else (self.move_used)
 
         self.render()
 
@@ -145,7 +146,6 @@ class RoombaBaseEnv(Env):
         self.screen.blit(move_txt, [650,300])
         self.screen.blit(cleaning_txt, [650, 400])
         pygame.display.update()
-        self.update = action_type.Nan
         self.clock.tick(0)
     
     def close(self):

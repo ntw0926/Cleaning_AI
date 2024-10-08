@@ -32,6 +32,10 @@ class RoombaEnv_1Tile(RoombaBaseEnv):
             self.prev_clean_num = self.map.clean_num
             return cleaned_this_move * 10
         elif self.update == action_type.Nan:
+            assert("unexpected behavior in reward_function")
+            return 0
+        else:
+            assert("update has no attribute of action type")
             return 0
         assert("Reward function unexpected happens with update " + str(self.update))
         return -1

@@ -33,8 +33,8 @@ class TrainAndLoggingCallback(BaseCallback):
         return True
 
 
-CHECKPOINT_DIR = '.map_basic/train/1Tile'
-LOG_DIR = '.map_basic/logs/1Tile'
+CHECKPOINT_DIR = 'map_basic/1Tile/train'
+LOG_DIR = 'map_basic/1Tile/log'
 
 def main():
     dealt_map = Map(pre_defined_maps.basic_map)
@@ -45,8 +45,6 @@ def main():
     callback = TrainAndLoggingCallback(check_freq=100000, save_path=CHECKPOINT_DIR)
     model = DQN('MlpPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
     model.learn(total_timesteps=10000000, callback=callback, progress_bar= True)
-
-    
 
 if __name__ == "__main__":
     main()
