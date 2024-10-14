@@ -3,7 +3,7 @@ sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
 
 from Ai.BaseGame.CleaningGame import *
 from gymnasium import *
-from gymnasium.spaces import Space, Discrete
+from gymnasium.spaces import *
 
 #줄수있는 변수
 #1. 총 활동 횟수 (무브, 턴, 인벨리드의 모든 액션의 합)
@@ -15,7 +15,7 @@ from gymnasium.spaces import Space, Discrete
     #2-1 Roomba의 위치에 1칸씩을 추가한 사각형
     #2-2 map에서 남은 dirty tile의 위치들
     #2-3 map 전체
-#3. roomba의 위치와 direction
+#3. roomba에 대한 모든 정보(direction, pos 등)
 
 class RoombaBaseEnv(Env):
     invalid_used : int

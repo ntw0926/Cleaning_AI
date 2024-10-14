@@ -12,7 +12,10 @@ from Ai.RoombaEnv import *
 import Ai.BaseGame.PreDefinedMap as pre_defined_maps
 
 #import roomba Ai variants
-from Ai.AiExtentions.RoombaEnv_1Tile import *
+import Ai.AiExtentions.RoombaEnv_1Tile as RE_1T
+import Ai.AiExtentions.RoombaEnv_1Tile_TP as RE_1T_Tp
+import Ai.AiExtentions.RoombaEnv_1Tile_DR as RE_1T_DR
+import Ai.AiExtentions.RoombaEnv_1Tile_DRTP as RE_1T_DRTP
 
 
 class TrainAndLoggingCallback(BaseCallback):
@@ -33,17 +36,18 @@ class TrainAndLoggingCallback(BaseCallback):
         return True
 
 
-CHECKPOINT_DIR = 'map_basic/1Tile/train'
-LOG_DIR = 'map_basic/1Tile/log'
+CHECKPOINT_DIR = 'map_basic/DirectionalReward/train'
+LOG_DIR = 'map_basic/DirectionalReward/log'
+
+
+dealt_map = Map(pre_defined_maps.basic_map)
+roomba = Roomba()
+env = RE_1T_DR.RoombaEnv_1Tile_DirectionalReward(dealt_map,roomba)
+env_checker.check_env(env)
 
 def main():
-    dealt_map = Map(pre_defined_maps.basic_map)
-    roomba = Roomba()
-    env = RoombaEnv_1Tile(dealt_map,roomba)
-    env_checker.check_env(env)
-
     callback = TrainAndLoggingCallback(check_freq=100000, save_path=CHECKPOINT_DIR)
-    model = DQN('MlpPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
+    model = DQN('MultiInputPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
     model.learn(total_timesteps=10000000, callback=callback, progress_bar= True)
 
 if __name__ == "__main__":
