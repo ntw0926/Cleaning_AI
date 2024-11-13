@@ -68,6 +68,7 @@ class RoombaBaseEnv(Env):
         }
 
     def reset(self, seed = None, options = None):
+        super().reset(seed=seed)
         if self.screen != None and not self.is_first_display:
             #visualization before reset
             invalid_txt = self.font.render("Invalid used : " + str(self.invalid_used), False, ((200,0,0) if self.update == action_type.Invalid else (0,0,0)))
@@ -78,11 +79,8 @@ class RoombaBaseEnv(Env):
             self.screen.blit(turn_txt, [650,200])
             self.screen.blit(move_txt, [650,300])
             self.screen.blit(cleaning_txt, [650, 400])
-            self.screen.blit(self.font.render("Stage Cleared", False, (255,0,255)), [650,500])
-            print("Stage Cleared")
             pygame.display.update()
 
-        super().reset(seed=seed)
         self.invalid_used = 0
         self.move_used = 0
         self.turn_used = 0
@@ -126,6 +124,7 @@ class RoombaBaseEnv(Env):
         self.map = map
 
     def get_observation(self):
+        assert("Observation function is Empty")
         return None
 
     def reward_function(self) -> float:

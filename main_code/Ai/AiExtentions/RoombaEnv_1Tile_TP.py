@@ -27,15 +27,15 @@ class RoombaEnv_1Tile_Timepunishment(RoombaBaseEnv):
     #move will grant reward based on number of tiles cleaned on that move
     # There is reward time factor that will punish when time goes by
     def reward_function(self) -> float:
-        reward : float = -self.step_taken/10
+        reward : float = -self.step_taken/10.0
         if self.update == action_type.Invalid:
-            return reward-10
+            return reward - 10
         elif self.update == action_type.Turn:
             return reward
         elif self.update == action_type.Move:
             cleaned_this_move = self.map.clean_num - self.prev_clean_num
             self.prev_clean_num = self.map.clean_num
-            return reward + (cleaned_this_move * 10)
+            return reward + (cleaned_this_move * 100)
         elif self.update == action_type.Nan:
             assert("unexpected behavior in reward_function")
             return 0

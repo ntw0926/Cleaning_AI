@@ -27,12 +27,11 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
     #move will grant reward based on number of tiles cleaned on that move
     # There is reward time factor that will punish when time goes by
     def reward_function(self) -> float:
-        reward : float = -self.step_taken/10
+        reward : float = -self.step_taken/10.0
         if self.update == action_type.Invalid:
-            return reward-10
+            return reward -10
 
         elif self.update == action_type.Turn:
-            reward -= 1
             dirty_at_direction = 0
             match self.roomba.arrow:
                 case direction.UP:
@@ -75,7 +74,7 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
             cleaned_this_move = self.map.clean_num - self.prev_clean_num
             self.prev_clean_num = self.map.clean_num
             if cleaned_this_move > 0:
-                reward += cleaned_this_move * 10
+                reward += cleaned_this_move * 100
             dirty_at_direction = 0
             match self.roomba.arrow:
                 case direction.UP:
@@ -83,7 +82,7 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
                         if self.map.map_tile[i][int(self.roomba.pos.y) - 1] == 1:
                             dirty_at_direction += 1
                     if dirty_at_direction != 0:
-                        return reward + dirty_at_direction * 5
+                        return reward + dirty_at_direction * 10
                     return reward
 
                 case direction.RIGHT:
@@ -91,7 +90,7 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
                         if self.map.map_tile[int(self.roomba.pos.x)+int(self.roomba.size.x)][i] == 1:
                             dirty_at_direction += 1
                     if dirty_at_direction != 0:
-                        return reward + dirty_at_direction * 5
+                        return reward + dirty_at_direction * 10
                     return reward
 
                 case direction.DOWN:
@@ -99,7 +98,7 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
                         if self.map.map_tile[i][int(self.roomba.pos.y) + int(self.roomba.size.y)] == 1:
                             dirty_at_direction += 1
                     if dirty_at_direction != 0:
-                        return reward + dirty_at_direction * 5
+                        return reward + dirty_at_direction * 10
                     return reward
 
                 case direction.LEFT:
@@ -107,7 +106,7 @@ class RoombaEnv_1Tile_DirectionalRewardTimePunishment(RoombaBaseEnv):
                         if self.map.map_tile[int(self.roomba.pos.x)-1][i] == 1:
                             dirty_at_direction += 1
                     if dirty_at_direction != 0:
-                        return reward + dirty_at_direction * 5
+                        return reward + dirty_at_direction * 10
                     return reward
 
                 case _:

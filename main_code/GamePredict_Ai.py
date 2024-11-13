@@ -4,6 +4,7 @@ import os
 from GameTrain_Ai import *
 
 def main():
+    print(env)
     model = DQN.load(CHECKPOINT_DIR+"/best_model_10000000", env = env)
     
     for episode in range(5):

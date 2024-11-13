@@ -34,7 +34,9 @@ class RoombaEnv_1Tile(RoombaBaseEnv):
         elif self.update == action_type.Move:
             cleaned_this_move = self.map.clean_num - self.prev_clean_num
             self.prev_clean_num = self.map.clean_num
-            return cleaned_this_move * 10
+            if cleaned_this_move < 0:
+                assert("Move Reward is negetive")
+            return cleaned_this_move * 100
         elif self.update == action_type.Nan:
             assert("unexpected behavior in reward_function")
             return 0

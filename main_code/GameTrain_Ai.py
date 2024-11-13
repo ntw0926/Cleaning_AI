@@ -3,10 +3,13 @@ sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
 import os
 # Import Base Callback for saving models
 from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3 import DQN
+from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
+from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common import env_checker
+from stable_baselines3.ppo import MultiInputPolicy
+import tensorflow as tf
 
 from Ai.RoombaEnv import *
 import Ai.BaseGame.PreDefinedMap as pre_defined_maps
@@ -32,22 +35,25 @@ class TrainAndLoggingCallback(BaseCallback):
         if self.n_calls % self.check_freq == 0:
             model_path = os.path.join(self.save_path, 'best_model_{}'.format(self.n_calls))
             self.model.save(model_path)
-            
         return True
+    def _on_rollout_end(self):
+        self.logger.record("Cleaned_tiles", self.training_env.get_attr("map")[0].clean_num)
 
 
-CHECKPOINT_DIR = 'map_basic/DirectionalReward/train'
-LOG_DIR = 'map_basic/DirectionalReward/log'
+
+CHECKPOINT_DIR = 'map_basic/1Tile_DirectionalReward/train'
+LOG_DIR = 'map_basic/1Tile_DirectionalReward/log'
 
 
 dealt_map = Map(pre_defined_maps.basic_map)
 roomba = Roomba()
 env = RE_1T_DR.RoombaEnv_1Tile_DirectionalReward(dealt_map,roomba)
+env.unwrapped.map
 env_checker.check_env(env)
 
 def main():
     callback = TrainAndLoggingCallback(check_freq=100000, save_path=CHECKPOINT_DIR)
-    model = DQN('MultiInputPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=120000, learning_starts=5, learning_rate = 0.01)
+    model = PPO("MultiInputPolicy", env, tensorboard_log=LOG_DIR, verbose=1)
     model.learn(total_timesteps=10000000, callback=callback, progress_bar= True)
 
 if __name__ == "__main__":
