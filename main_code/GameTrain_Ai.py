@@ -16,7 +16,7 @@ import Ai.BaseGame.PreDefinedMap as pre_defined_maps
 
 #import roomba Ai variants
 import Ai.AiExtentions.RoombaEnv_1Tile as RE_1T
-import Ai.AiExtentions.RoombaEnv_1Tile_TP as RE_1T_Tp
+import Ai.AiExtentions.RoombaEnv_1Tile_TP as RE_1T_TP
 import Ai.AiExtentions.RoombaEnv_1Tile_DR as RE_1T_DR
 import Ai.AiExtentions.RoombaEnv_1Tile_DRTP as RE_1T_DRTP
 
@@ -41,13 +41,13 @@ class TrainAndLoggingCallback(BaseCallback):
 
 
 
-CHECKPOINT_DIR = 'map_basic/1Tile_DirectionalReward/train'
-LOG_DIR = 'map_basic/1Tile_DirectionalReward/log'
+CHECKPOINT_DIR = 'map_with_table/1Tile_DirectionalRewardTimePunishment/train'
+LOG_DIR = 'map_with_table/1Tile_DirectionalRewardTimePunishment/log'
 
 
-dealt_map = Map(pre_defined_maps.basic_map)
+dealt_map = Map(pre_defined_maps.map_with_table)
 roomba = Roomba()
-env = RE_1T_DR.RoombaEnv_1Tile_DirectionalReward(dealt_map,roomba)
+env = RE_1T_DRTP.RoombaEnv_1Tile_DirectionalRewardTimePunishment(dealt_map,roomba)
 env.unwrapped.map
 env_checker.check_env(env)
 

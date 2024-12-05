@@ -5,7 +5,7 @@ from GameTrain_Ai import *
 
 def main():
     print(env)
-    model = DQN.load(CHECKPOINT_DIR+"/best_model_10000000", env = env)
+    model = PPO.load(CHECKPOINT_DIR+"/best_model_10000000")
     
     for episode in range(5):
         obs = env.reset()[0]
@@ -13,12 +13,14 @@ def main():
         total_reward = 0
         done = False
         turncated = False
+        step = 0
         while (not done) and (not turncated) : 
             action, state = model.predict(obs)
             obs, reward, done, turncated, info = env.step(int(action))
             total_reward += reward
             time.sleep(0.02)
-        print('Total Reward for episode {} is {}'.format(episode, total_reward))
+            step += 1
+        print('Total Reward for episode {} is {} / step taken {}'.format(episode, total_reward, step))
 
 if __name__ == "__main__":
     main()

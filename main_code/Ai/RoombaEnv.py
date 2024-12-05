@@ -144,6 +144,13 @@ class RoombaBaseEnv(Env):
         self.screen.blit(turn_txt, [650,200])
         self.screen.blit(move_txt, [650,300])
         self.screen.blit(cleaning_txt, [650, 400])
+
+        self.roomba.prev_pos.append(self.roomba.pos)
+        i = 1
+        while i < len(self.roomba.prev_pos):
+            pygame.draw.line(self.screen, (255,0,0), (self.roomba.prev_pos[i-1])*50 + pygame.Vector2(50,50), (self.roomba.prev_pos[i])*50 + pygame.Vector2(50,50), 10)
+            i = i + 1
+
         pygame.display.update()
         self.clock.tick(0)
     

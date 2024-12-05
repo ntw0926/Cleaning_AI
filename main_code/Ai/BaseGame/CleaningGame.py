@@ -106,17 +106,21 @@ class Roomba():
     #Position of Left bottom 
     pos : pygame.Vector2
     _reset_pos : pygame.Vector2
+    prev_pos = list()
     arrow = direction.UP
     
     def __init__(self, size:pygame.Vector2 = pygame.Vector2(2,2), pos:pygame.Vector2 = pygame.Vector2(1,1)):
         self.size = size
         self.pos = pos
         self._reset_pos = pos
+        self.prev_pos.append(self.pos)
+        
 
     def reset_pos(self):
         self.pos.x = self._reset_pos.x
         self.pos.y = self._reset_pos.y
         self.arrow = direction.UP
+        self.prev_pos.clear()
 
     def valid_movement(self, map : Map, movement : pygame.Vector2) -> action_type:
         if movement.x != 0 and movement.y !=0:

@@ -3,7 +3,7 @@ sys.path.append('d:\\Assignment\\graduate\\Cleaning_AI\\main_code')
 
 from Ai.RoombaEnv import *
 
-class RoombaEnv_1Tile_Timepunishment(RoombaBaseEnv):
+class RoombaEnv_1Tile_TimePunishment(RoombaBaseEnv):
     def __init__(self,map : Map, roomba : Roomba):
         super().__init__(map, roomba)
         obs_map = spaces.Box(low= 0, high=2, shape=(int(self.roomba.size.x +2), int(self.roomba.size.y + 2)), dtype=np.int64)
