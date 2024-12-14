@@ -20,6 +20,7 @@ def main():
             total_reward += reward
             time.sleep(0.02)
             step += 1
+        pygame.image.save(env.screen, model_text + "_" + map_text + "_" + str(episode) + ".PNG" )
         print('Total Reward for episode {} is {} / step taken {}'.format(episode, total_reward, step))
 
 if __name__ == "__main__":
